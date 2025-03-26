@@ -18,6 +18,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -30,6 +31,7 @@ import lombok.NoArgsConstructor;
 		name = "unique_hotel_room_date", 
 		columnNames = {"hotel_id", "room_id", "date"}
 		))
+@Builder
 public class Inventory {
 	
 	@Id
