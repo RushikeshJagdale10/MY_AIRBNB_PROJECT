@@ -2,9 +2,11 @@ package com.it.airbnb.service;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.it.airbnb.dto.HotelDto;
 import com.it.airbnb.entity.Hotel;
+import com.it.airbnb.entity.Room;
 import com.it.airbnb.exception.ResourceNotFoundException;
 import com.it.airbnb.repository.HotelRepository;
 
@@ -18,6 +20,7 @@ public class HotelServiceImpl implements HotelService {
 
 	
 	private final HotelRepository hotelRepository;
+	private final InventoryService inventoryService;
 	private final ModelMapper modelMapper;
 	
 	@Override
@@ -34,7 +37,7 @@ public class HotelServiceImpl implements HotelService {
 
 	@Override
 	public HotelDto getHotelById(Long id) {
-		log.info("Getting the Hotel with Id: ", id);
+		log.info("Getting the Hotel with Id: " + id);
 		Hotel hotel = hotelRepository
 						.findById(id)
 						.orElseThrow(() -> new ResourceNotFoundException("Hotel not found with Id: " + id));
@@ -58,15 +61,37 @@ public class HotelServiceImpl implements HotelService {
 	}
 
 	@Override
-	public Boolean deleteHotelById(Long id) {
-		log.info("Deleting the Hotel with Id: ", id);
-		boolean exists = hotelRepository.existsById(id);
-		if(!exists) throw new ResourceNotFoundException("Hotel not found with Id: " + id);
+	public void deleteHotelById(Long id) {
 		
+		//for future deletion of inventories we need hotel data
+		
+		log.info("Deleting the Hotel with Id: ", id);
+		Hotel hotel = hotelRepository
+				.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Hotel not found with Id: " + id));
+
 		hotelRepository.deleteById(id);
 		//TODO: delete the future inventories for this hotel
+		for(Room room : hotel.getRooms()) {
+		inventoryService.deleteFutureInventories(room);
+		}
 		
-		return true;
+	}
+
+	@Override
+	@Transactional
+	public void activateHotel(Long hotelId) {
+		log.info("Activating the Hotel with Id: "+ hotelId);
+		Hotel hotel = hotelRepository
+						.findById(hotelId)
+						.orElseThrow(() -> new ResourceNotFoundException("Hotel not found with Id: " + hotelId));
+		hotel.setActive(true);
+		log.info("Testing for next steps..");
+		//Assuming only do it once
+		for(Room room : hotel.getRooms()) {
+			log.info("Initializing Room Availability for year inside Inventory with Room Id: " + room.getId());
+			inventoryService.initializeRoomForAYear(room);
+		}
 	}
 	
 	
