@@ -1,5 +1,7 @@
 package com.it.airbnb.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,6 +37,19 @@ public class HotelController {
 		
 		return new ResponseEntity<>(hotel, HttpStatus.CREATED);
 	}
+	
+	@GetMapping
+	public ResponseEntity<List<HotelDto>> getAllHotels() {
+		
+		log.info("Attempting to get all hotels. ");
+		
+		List<HotelDto> hotel = hotelService.getAllHotels();
+		
+		return new ResponseEntity<>(hotel, HttpStatus.OK);
+	}
+	
+	
+	
 	
 	@GetMapping("/{hotelId}")
 	public ResponseEntity<HotelDto> getHotelById(@PathVariable Long hotelId) {

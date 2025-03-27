@@ -1,5 +1,6 @@
 package com.it.airbnb.entity;
 
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,13 +23,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -66,10 +68,6 @@ public class Booking {
 	@UpdateTimestamp
 	private LocalDateTime updatedAt;
 	
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn( name = "payment_id")
-	private Payment payment;
-	
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private BookingStatus bookingStatus;
@@ -81,6 +79,9 @@ public class Booking {
 			inverseJoinColumns = @JoinColumn(name = "guest_id")
 	)
 	private Set<Guest> guests;
+	
+	@Column(nullable = false, precision = 10, scale = 2)
+	private BigDecimal amount;
 	
 	
 }
