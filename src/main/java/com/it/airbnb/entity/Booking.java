@@ -9,6 +9,7 @@ import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.it.airbnb.enums.BookingStatus;
 
 import jakarta.persistence.Column;
@@ -42,15 +43,18 @@ public class Booking {
 	private Long id;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="hotel_id", nullable = false) 
+	@JoinColumn(name="hotel_id", nullable = false)
+	@JsonIgnore
 	private Hotel hotel;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="room_id", nullable = false)
+	@JsonIgnore
 	private Room room;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
+	@JsonIgnore
 	private User user;
 	
 	@Column(nullable = false)
@@ -78,6 +82,7 @@ public class Booking {
 			joinColumns = @JoinColumn(name = "booking_id"),
 			inverseJoinColumns = @JoinColumn(name = "guest_id")
 	)
+	@JsonIgnore
 	private Set<Guest> guests;
 	
 	@Column(nullable = false, precision = 10, scale = 2)

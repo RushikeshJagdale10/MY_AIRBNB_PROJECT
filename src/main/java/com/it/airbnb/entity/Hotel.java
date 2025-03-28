@@ -6,6 +6,7 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
@@ -63,6 +64,6 @@ public class Hotel {
 	private User owner;
 	
 	@OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
-	@JsonManagedReference
+	@JsonIgnore
 	private List<Room> rooms;
 }
