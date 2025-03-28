@@ -17,7 +17,5 @@ public class GuestDto {
 	private String name;
 	private Gender gender;
 	private Integer age;
-	
-	
 
 }

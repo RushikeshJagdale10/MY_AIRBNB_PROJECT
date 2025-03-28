@@ -7,6 +7,7 @@ import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.it.airbnb.enums.PaymentStatus;
 import com.it.airbnb.enums.Role;
 
@@ -53,6 +54,7 @@ public class Payment {
 	private LocalDateTime updatedAt;
 	
 	@OneToOne(fetch = FetchType.LAZY)
+	@JsonIgnore
 	private Booking booking;
 	
 }

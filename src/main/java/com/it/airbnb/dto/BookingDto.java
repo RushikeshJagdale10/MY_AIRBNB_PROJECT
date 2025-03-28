@@ -20,12 +20,6 @@ public class BookingDto {
 	
 	private Long id;
 	
-	private Hotel hotel;
-	
-	private Room room;
-	
-	private User user;
-	
 	private Integer roomCounts;
 	
 	private LocalDate checkInDate;

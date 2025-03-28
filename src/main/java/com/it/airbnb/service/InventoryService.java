@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.it.airbnb.dto.HotelDto;
+import com.it.airbnb.dto.HotelPriceDto;
 import com.it.airbnb.dto.HotelSearchRequest;
 import com.it.airbnb.entity.Room;
 
@@ -14,6 +15,6 @@ public interface InventoryService {
 	
 	void deleteAllInventories(Room room);
 
-	Page<HotelDto> searchHotels(HotelSearchRequest hotelSearchRequest);
+	Page<HotelPriceDto> searchHotels(HotelSearchRequest hotelSearchRequest);
 
 }

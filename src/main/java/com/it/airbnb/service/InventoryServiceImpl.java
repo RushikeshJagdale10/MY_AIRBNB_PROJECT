@@ -12,11 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.it.airbnb.dto.HotelDto;
+import com.it.airbnb.dto.HotelPriceDto;
 import com.it.airbnb.dto.HotelSearchRequest;
 import com.it.airbnb.entity.Hotel;
 import com.it.airbnb.entity.Inventory;
 import com.it.airbnb.entity.Room;
 import com.it.airbnb.exception.ResourceNotFoundException;
+import com.it.airbnb.repository.HotelMinPriceRepository;
 import com.it.airbnb.repository.InventoryRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class InventoryServiceImpl implements InventoryService{
 	
 	private final InventoryRepository inventoryRepository;
+	private final HotelMinPriceRepository hotelMinPriceRepository;
 	private final ModelMapper modelMapper;
 	
 	
@@ -69,19 +72,19 @@ public class InventoryServiceImpl implements InventoryService{
 
 
 	@Override
-    public Page<HotelDto> searchHotels(HotelSearchRequest hotelSearchRequest) {
+    public Page<HotelPriceDto> searchHotels(HotelSearchRequest hotelSearchRequest) {
         log.info("Searching hotels for {} city, from {} to {}", hotelSearchRequest.getCity(), hotelSearchRequest.getStartDate(), hotelSearchRequest.getEndDate());
         Pageable pageable = PageRequest.of(hotelSearchRequest.getPage(), hotelSearchRequest.getSize());
         long dateCount =
                 ChronoUnit.DAYS.between(hotelSearchRequest.getStartDate(), hotelSearchRequest.getEndDate()) + 1;
 
-        Page<Hotel> hotelPage = inventoryRepository.findHotelsWithAvailableInventory(hotelSearchRequest.getCity(),
+        // business logic - 90 days
+        Page<HotelPriceDto> hotelPage =
+                hotelMinPriceRepository.findHotelsWithAvailableInventory(hotelSearchRequest.getCity(),
                 hotelSearchRequest.getStartDate(), hotelSearchRequest.getEndDate(), hotelSearchRequest.getRoomsCount(),
                 dateCount, pageable);
-        
-        if(hotelPage.isEmpty()) throw new ResourceNotFoundException("Hotels Mentioned Between Dates are Not Available!!");
 
-        return hotelPage.map((element) -> modelMapper.map(element, HotelDto.class));
+        return hotelPage;
     }
 	
 	
