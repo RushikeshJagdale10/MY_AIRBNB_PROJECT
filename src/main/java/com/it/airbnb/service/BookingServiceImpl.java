@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import com.it.airbnb.entity.Room;
 import com.it.airbnb.entity.User;
 import com.it.airbnb.enums.BookingStatus;
 import com.it.airbnb.exception.ResourceNotFoundException;
+import com.it.airbnb.exception.UnAuthorisedException;
 import com.it.airbnb.repository.BookingRepository;
 import com.it.airbnb.repository.GuestRepository;
 import com.it.airbnb.repository.HotelRepository;
@@ -88,7 +90,7 @@ public class BookingServiceImpl implements BookingService{
 		//TODO: Create the Booking
 		
 		User user = new User();
-		user.setId(1L); //TODO: REMOVE DUMMY USER
+		//user.setId(1L); //TODO: REMOVE DUMMY USER
 		
 		//TODO: Calculate Dynamic amount
 		
@@ -98,7 +100,7 @@ public class BookingServiceImpl implements BookingService{
 								 .room(room)
 								 .checkInDate(bookingRequest.getCheckInDate())
 								 .checkOutDate(bookingRequest.getCheckOutDate())
-								 .user(user)
+								 .user(getCurrentUser())
 								 .roomCounts(bookingRequest.getRoomsCount())
 								 .amount(BigDecimal.TEN)
 								 .build();
@@ -120,6 +122,15 @@ public class BookingServiceImpl implements BookingService{
 		
 		Booking booking = bookingRepository.findById(bookingId)
 										   .orElseThrow(() -> new ResourceNotFoundException("Booking not found with Id: "+ bookingId));
+		
+		//TODO: Get Current User
+		User user = getCurrentUser();
+		
+		if(!user.equals(booking.getUser())) {
+			throw new UnAuthorisedException("Booking does not belong to this user with Id: " + user.getId());
+			
+		}
+		
 		if(hasBookingExpired(booking)) {
 			throw new IllegalStateException("Booking has Already Expired!!");
 		}
@@ -130,7 +141,7 @@ public class BookingServiceImpl implements BookingService{
 		
 		for(GuestDto guestDto : guestDtoList) {
 			Guest guest = modelMapper.map(guestDto, Guest.class);
-			guest.setUser(getCurrentUser());
+			guest.setUser(user);
 			guest = guestRepository.save(guest);
 			booking.getGuests().add(guest);
 		}
@@ -148,9 +159,8 @@ public class BookingServiceImpl implements BookingService{
 	}
 	
 	public User getCurrentUser() {
-		User user = new User();
-		user.setId(1L);
-		return user;
+		
+		return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 	}
 	
 	

@@ -9,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -60,10 +61,16 @@ public class Hotel {
 	@Column(nullable = false)
 	private Boolean active;
 	
-	@ManyToOne
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	private User owner;
 	
 	@OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<Room> rooms;
+	
+	@OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
+	private List<HotelMinPrice> hotelMinPrice;
+
+	
 }

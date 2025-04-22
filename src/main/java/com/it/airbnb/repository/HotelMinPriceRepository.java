@@ -34,6 +34,5 @@ public interface HotelMinPriceRepository extends JpaRepository<HotelMinPrice, Lo
 			@Param("dateCount") Long dateCount,
 			Pageable pageable
 	);
-
 	Optional<HotelMinPrice> findByHotelAndDate(Hotel hotel, LocalDate date);
 }

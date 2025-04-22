@@ -23,7 +23,7 @@ public class UrgencyPricingStrategy implements PricingStrategy {
 		
 		LocalDate today = LocalDate.now();
 		
-		if(inventory.getDate().isBefore(today) && inventory.getDate().isBefore(today.plusDays(7))) {
+		if(!inventory.getDate().isBefore(today) && inventory.getDate().isBefore(today.plusDays(7))) {
 			
 			price = price.multiply(BigDecimal.valueOf(1.15));
 			
