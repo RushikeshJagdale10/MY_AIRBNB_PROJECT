@@ -39,7 +39,7 @@ public class PricingUpdateService {
     private final PricingService pricingService;
 
 //    @Scheduled(cron = "*/5 * * * * *") every 5 seconds
-    @Scheduled(cron = "0 */5 * * * *")
+    @Scheduled(cron = "0 */59 * * * *")
     public void updatePrices() {
         int page = 0;
         int batchSize = 100;
