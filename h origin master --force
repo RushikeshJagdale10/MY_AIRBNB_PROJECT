@@ -1,0 +1,29 @@
+[33mcommit 4fe784a989f2ca04615b42f501848865bad243a2[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m
+Author: RushikeshJagdale10 <rushikshjagdale10@gmail.com>
+Date:   Sat Apr 26 13:22:27 2025 +0530
+
+    Removed application.properties from Git tracking
+
+[33mcommit ebe3728d08df0343ae00f06efbae253080ce4eb9[m
+Author: RushikeshJagdale10 <rushikshjagdale10@gmail.com>
+Date:   Sat Apr 26 13:18:30 2025 +0530
+
+    Stripe Payment System for Booking Confirmation and Refund Added
+
+[33mcommit 45cffe81a283a3fdba8cff8ba97c8bc9da2d38ac[m
+Author: RushikeshJagdale10 <rushikshjagdale10@gmail.com>
+Date:   Tue Apr 22 13:35:26 2025 +0530
+
+    Authentication & Authorization part Completed
+
+[33mcommit 9c3d1d895858361761b05e61cdf5983e3f07e1e5[m
+Author: RushikeshJagdale10 <rushikshjagdale10@gmail.com>
+Date:   Wed Mar 26 00:24:19 2025 +0530
+
+    Hotel Api's Created and Exceptions Handled with meaningful messages..
+
+[33mcommit 45170274a8e42d82daabe243656fdad3c1f9aa43[m
+Author: sanga <sanga@SINGUNAMA>
+Date:   Mon Mar 24 22:48:59 2025 +0530
+
+    Project Entities Created..
