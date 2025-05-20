@@ -16,6 +16,7 @@ import com.it.airbnb.exception.ResourceNotFoundException;
 import com.it.airbnb.exception.UnAuthorisedException;
 import com.it.airbnb.repository.HotelRepository;
 import com.it.airbnb.repository.RoomRepository;
+import com.it.airbnb.util.AppUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -108,6 +109,39 @@ public class RoomServiceImpl implements RoomService {
 		roomRepository.deleteById(roomId);
 		
 		
+	}
+
+
+
+	@Override
+	@Transactional
+	public RoomDto updateRoomById(Long hotelId, Long roomId, RoomDto roomDto) {
+		
+		log.info("Updating the room with Room Id: {}", roomId );
+		
+		Hotel hotel = hotelRepository
+				.findById(hotelId)
+				.orElseThrow(() -> new ResourceNotFoundException("Hotel not found with Id: " + hotelId));
+		
+		Room room = roomRepository.findById(roomId)
+				  .orElseThrow(() -> new ResourceNotFoundException("Room not found with Id :" + roomId));
+		
+		User user = AppUtils.getCurrentUser();
+		
+		if(!user.equals(room.getHotel().getOwner()))
+		{
+			throw new UnAuthorisedException("This User Does Not Own This room With Id: " + roomId);
+		}
+		
+		modelMapper.map(roomDto, room);
+		room.setId(roomId);
+		
+		// TODO: update inventory incase room price is updated
+		
+		room = roomRepository.save(room);
+		
+		
+		return modelMapper.map(room, RoomDto.class);
 	}
 
 	

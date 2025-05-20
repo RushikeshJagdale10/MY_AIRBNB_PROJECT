@@ -1,5 +1,6 @@
 package com.it.airbnb.entity;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -8,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.it.airbnb.enums.Gender;
 import com.it.airbnb.enums.Role;
 
 import jakarta.persistence.Column;
@@ -42,6 +44,11 @@ public class User implements UserDetails {
 	private String password; // ENCODED
 	
 	private String name;
+	
+	private LocalDate dateOfBirth;
+	
+	@Enumerated(EnumType.STRING)
+	private Gender gender;
 	
 	@ElementCollection(fetch = FetchType.EAGER)
 	@Enumerated(EnumType.STRING)

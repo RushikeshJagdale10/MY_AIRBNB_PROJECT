@@ -1,6 +1,7 @@
 package com.it.airbnb.dto;
 
-import com.it.airbnb.entity.User;
+import java.time.LocalDate;
+
 import com.it.airbnb.enums.Gender;
 
 import lombok.AllArgsConstructor;
@@ -10,11 +11,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GuestDto {
+public class ProfileUpdateRequestDto {
 	
-	private Long id;
 	private String name;
+	
+	private LocalDate dateOfBirth;
+	
 	private Gender gender;
-	private Integer age;
 
 }

@@ -18,6 +18,7 @@ import com.it.airbnb.exception.ResourceNotFoundException;
 import com.it.airbnb.exception.UnAuthorisedException;
 import com.it.airbnb.repository.HotelRepository;
 import com.it.airbnb.repository.RoomRepository;
+import com.it.airbnb.util.AppUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,13 +53,22 @@ public class HotelServiceImpl implements HotelService {
 	@Override
 	public List<HotelDto> getAllHotels() {
 		
-		List<HotelDto> hotels = hotelRepository.findAllHotels();
+		log.info("Inside Hotel Service Method : Getting All Hotels");
+		
+		User user = AppUtils.getCurrentUser();
+		
+		log.info("Getting all hotels for the admin user with ID: {}", user.getId());
+
+		
+		List<Hotel> hotels = hotelRepository.findByOwner(user);
 		if(hotels.isEmpty()) throw new ResourceNotFoundException("Hotels Not found...");
 		
-		log.info("Hotels Data : " + hotels);
 		
 		// Convert List<Hotel> to List<HotelDto>
-	    return hotels;
+	    return hotels
+	    		.stream()
+	    		.map(element -> modelMapper.map(element, HotelDto.class))
+	    		.collect(Collectors.toList());
 
 	}
 	

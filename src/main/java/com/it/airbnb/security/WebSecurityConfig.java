@@ -60,6 +60,9 @@ public class WebSecurityConfig {
 
                         // All authenticated users (any role) can access /bookings/**
                         .requestMatchers("/bookings/**").authenticated()
+                        
+                        // All authenticated users (any role) can access /users/**
+                        .requestMatchers("/users/**").authenticated()
 
                         // Allow public access to all other endpoints
                         .anyRequest().permitAll()

@@ -76,13 +76,12 @@ public class Booking {
 	@Column(nullable = false)
 	private BookingStatus bookingStatus;
 	
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
 			name = "booking_guest",
 			joinColumns = @JoinColumn(name = "booking_id"),
 			inverseJoinColumns = @JoinColumn(name = "guest_id")
 	)
-	@JsonIgnore
 	private Set<Guest> guests;
 	
 	@Column(nullable = false, precision = 10, scale = 2)

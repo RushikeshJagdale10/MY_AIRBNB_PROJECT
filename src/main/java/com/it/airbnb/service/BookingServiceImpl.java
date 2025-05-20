@@ -1,14 +1,19 @@
 package com.it.airbnb.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.it.airbnb.dto.BookingDto;
 import com.it.airbnb.dto.BookingRequest;
 import com.it.airbnb.dto.GuestDto;
+import com.it.airbnb.dto.HotelReportDto;
 import com.it.airbnb.entity.Booking;
 import com.it.airbnb.entity.Guest;
 import com.it.airbnb.entity.Hotel;
@@ -31,6 +37,7 @@ import com.it.airbnb.repository.HotelRepository;
 import com.it.airbnb.repository.InventoryRepository;
 import com.it.airbnb.repository.RoomRepository;
 import com.it.airbnb.stratagy.PricingService;
+import com.it.airbnb.util.AppUtils;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;
@@ -333,6 +340,71 @@ public class BookingServiceImpl implements BookingService{
 	public User getCurrentUser() {
 		
 		return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+	}
+
+	@Override
+	public List<BookingDto> getAllBookingsByHotelId(Long hotelId) {
+		
+		Hotel hotel = hotelRepository.findById(hotelId).orElseThrow(() -> new ResourceNotFoundException("Hotel not found with id: " + hotelId));
+		
+		
+		User user = getCurrentUser();
+		
+		log.info("Getting All Bookings for The Hotel With Id:" + hotelId);
+		
+		if(!user.equals(hotel.getOwner())) throw new AccessDeniedException("You are not the owner of hotel with Id :" + hotelId);
+			
+		List<Booking> bookings =  bookingRepository.findByHotel(hotel);
+		
+		//bookings.forEach(System.out::println);
+		
+		return bookings
+				.stream()
+				.map((element) -> modelMapper.map(element, BookingDto.class))
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public HotelReportDto getHotelReport(Long hotelId, LocalDate startDate, LocalDate endDate) {
+		
+		Hotel hotel = hotelRepository.findById(hotelId).orElseThrow(() -> new ResourceNotFoundException("Hotel not found with id: " + hotelId));
+		
+		User user = getCurrentUser();
+		
+		log.info("Generating Reports for The Hotel With Id:" + hotelId);
+		
+		if(!user.equals(hotel.getOwner())) throw new AccessDeniedException("You are not the owner of hotel with Id :" + hotelId);
+		
+		// TODO: Conversion of LocalDate -> LocalDateTime
+		LocalDateTime startDateTime = startDate.atStartOfDay();
+		LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+		
+		List<Booking> bookings = bookingRepository.findByHotelAndCreatedAtBetween(hotel, startDateTime, endDateTime);
+		
+		Long totalConfirmedBookings = bookings.stream()
+			    .filter(booking -> booking.getBookingStatus() == BookingStatus.CONFIRMED)
+			    .count();									  
+		
+		BigDecimal totalRevenueOfConfirmedBooking = bookings.stream()
+				.filter(booking -> booking.getBookingStatus() == BookingStatus.CONFIRMED)
+				.map(Booking::getAmount)
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+		
+		BigDecimal avgRevenue = totalConfirmedBookings == 0 ? BigDecimal.ZERO : 
+			totalRevenueOfConfirmedBooking.divide(BigDecimal.valueOf(totalConfirmedBookings), RoundingMode.HALF_UP);
+		
+		return new HotelReportDto(totalConfirmedBookings, totalRevenueOfConfirmedBooking, avgRevenue);
+	}
+
+	@Override
+	public List<BookingDto> getMyBookings() {
+		
+		User user = AppUtils.getCurrentUser();
+		
+		return bookingRepository.findByUser(user).stream()
+				.map((element) -> modelMapper.map(element, BookingDto.class))
+				.collect(Collectors.toList());
+		
 	}
 
 	
